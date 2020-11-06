@@ -1,4 +1,6 @@
-# Info
+# Demo
 
-just double click `BELauncher.exe`, it should open and protect the cmd sitting in the same folder... If you get any errors simply replace the file with your cmd.exe and it should work fine.
-Nevertheless if BattlEye ever patches this the lsass.exe/csrss.exe hooks will be installed even if BattlEye refuses to protect such applications.
+First start battleye by running BElauncher.exe inside of the BattlEye folder. It should open a cmd.exe (protected by BattlEye). Then open dbgview.exe and filter for `[lsass]*`. Finally
+run example.bat, you should see this in dbgview.exe:
+
+<img src="https://imgur.com/syR78wp.png"/>
