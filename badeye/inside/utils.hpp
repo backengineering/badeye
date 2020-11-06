@@ -7,17 +7,17 @@
 
 namespace utils
 {
-	struct nt_peb
+	typedef struct _nt_peb
 	{
 		std::uintptr_t res[2];
 		std::uintptr_t image_base;
 		std::uintptr_t ldr;
 		std::uintptr_t proc_params;
-	};
+	} nt_peb;
 
-	inline uint32_t get_pid(const std::wstring_view process_name)
+	__forceinline auto get_pid(const std::wstring_view process_name) -> std::uint32_t
 	{
-		const auto handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+		const auto handle = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, NULL);
 		if (handle == INVALID_HANDLE_VALUE)
 			return !CloseHandle(handle);
 
@@ -34,7 +34,7 @@ namespace utils
 		return NULL;
 	}
 
-	inline PPEB get_process_peb(const HANDLE process_handle)
+	__forceinline auto get_process_peb(const HANDLE process_handle) -> nt_peb*
 	{
 		PROCESS_BASIC_INFORMATION process_info{};
 		ULONG bytes_returned;
@@ -47,20 +47,18 @@ namespace utils
 			&bytes_returned
 		) != ERROR_SUCCESS)
 			return nullptr;
-		return process_info.PebBaseAddress;
+
+		return reinterpret_cast<utils::nt_peb*>(process_info.PebBaseAddress);
 	}
 
-	// could do a snapshot but i have this code handy atm...
-	inline std::uintptr_t get_proc_base(const HANDLE proc_handle)
+	__forceinline auto get_proc_base(const HANDLE proc_handle) -> std::uintptr_t
 	{
-		if (!proc_handle) return {};
 		const auto ppeb = reinterpret_cast<std::uintptr_t>(get_process_peb(proc_handle));
 		const auto peb = bedaisy::read<nt_peb>(proc_handle, ppeb);
 		return peb.image_base;
 	}
 
-	// could do a snapshot but i have this code handy atm...
-	inline std::uintptr_t get_module_base(const HANDLE proc_handle, const wchar_t* module_handle)
+	__forceinline auto get_module_base(const HANDLE proc_handle, const wchar_t* module_handle) -> std::uintptr_t
 	{
 		const auto ppeb = reinterpret_cast<std::uintptr_t>(get_process_peb(proc_handle));
 		const auto peb = bedaisy::read<nt_peb>(proc_handle, ppeb);

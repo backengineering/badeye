@@ -104,7 +104,7 @@ namespace util
 		data.insert(data.begin(), std::istream_iterator<uint8_t>(fstr), std::istream_iterator<uint8_t>());
 	}
 
-	inline uint32_t get_process_id(const std::wstring_view process_name)
+	inline uint32_t get_pid(const std::wstring_view process_name)
 	{
 		// open a system snapshot of all loaded processes
 		uq_handle snap_shot{ CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0), &CloseHandle };
@@ -506,7 +506,7 @@ namespace nozzle
 
 	void injector::set_target(std::wstring proc_name)
 	{
-		target_pid = util::get_process_id(proc_name);
+		target_pid = util::get_pid(proc_name);
 	}
 
 	void* injector::get_pe_image() const

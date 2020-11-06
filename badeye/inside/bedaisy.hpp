@@ -10,7 +10,7 @@ using ioctl_data = struct { HANDLE drv_handle; void* return_addr; };
 
 namespace bedaisy
 {
-	struct beioctl
+	struct beioctl_t
 	{
 		void* ret_addr;
 		void* handle;
@@ -20,7 +20,7 @@ namespace bedaisy
 		size_t* bytes_read;
 	};
 
-	inline ioctl_data get_ioctl_data()
+	__forceinline ioctl_data get_ioctl_data()
 	{
 		const auto wpm =
 			reinterpret_cast<std::uint8_t*>(
@@ -47,20 +47,20 @@ namespace bedaisy
 		return { {}, {} };
 	}
 
-	inline void read(HANDLE proc_handle, std::uintptr_t addr, void* buffer, std::size_t size)
+	__forceinline void read(HANDLE proc_handle, std::uintptr_t addr, void* buffer, std::size_t size)
 	{
 		if (!addr || !buffer || !size)
 			return;
 
 		const auto [daisy_handle, return_addr] = get_ioctl_data();
-		const beioctl ioctl_data
+		beioctl_t ioctl_data
 		{
 			return_addr,
 			proc_handle,
 			addr,
 			buffer,
 			size,
-			(size_t*)0xFFFFFFF3423424
+			nullptr
 		};
 
 		DWORD bytes_read;
@@ -72,18 +72,18 @@ namespace bedaisy
 			sizeof ioctl_data,
 			nullptr,
 			NULL,
-			&bytes_read,
+			(LPDWORD)&bytes_read,
 			nullptr
 		);
 	}
 
-	void write(HANDLE proc_handle, std::uintptr_t addr, void* buffer, std::size_t size)
+	__forceinline void write(HANDLE proc_handle, std::uintptr_t addr, void* buffer, std::size_t size)
 	{
 		if (!proc_handle || !addr)
 			return;
 
 		const auto [daisy_handle, return_addr] = get_ioctl_data();
-		const beioctl ioctl_data
+		beioctl_t ioctl_data
 		{
 			return_addr,
 			proc_handle,
@@ -108,7 +108,7 @@ namespace bedaisy
 	}
 
 	template <class T>
-	inline T read(HANDLE proc_handle, std::uintptr_t addr)
+	__forceinline T read(HANDLE proc_handle, std::uintptr_t addr)
 	{
 		if (!addr || !proc_handle)
 			return {};
@@ -119,7 +119,7 @@ namespace bedaisy
 	}
 
 	template <class T>
-	inline void write(HANDLE proc_handle, std::uintptr_t addr, const T& data)
+	__forceinline void write(HANDLE proc_handle, std::uintptr_t addr, const T& data)
 	{
 		if (!proc_handle || !addr)
 			return;

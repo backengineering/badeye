@@ -9,7 +9,13 @@ int main(const int argc, const char** argv)
 		return -1;
 	}
 
-	const auto lsass_pid = util::get_process_id(L"lsass.exe");
+	if (!util::get_pid(L"BEService.exe"))
+	{
+		std::perror("[-] please run BattlEye...\n");
+		return -1;
+	}
+
+	const auto lsass_pid = util::get_pid(L"lsass.exe");
 	std::printf("[+] lsass_pid => %p\n", lsass_pid);
 
 	nozzle::injector inject(argv[1], lsass_pid);
