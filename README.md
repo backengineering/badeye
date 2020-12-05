@@ -2,6 +2,7 @@
     <div>
         <img src="https://imgur.com/Pn3wUUd.png"/>
     </div>
+    <p>EAC has recently black listed battleye due to this repo so you can no longer bypass EAC using BattlEye</p>
 </div>
 
 ### Credit
